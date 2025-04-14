@@ -1,6 +1,2 @@
-<?php
-
-$dbb = new PDO('mysql:host=localhost;dbname=aribilgi;charset=UTF8', 'root', '');
-
-
-?>
+<?php 
+$db = new PDO('mysql:host=localhost; dbname=aribilgi;chartset=UTF8','root','');
