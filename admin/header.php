@@ -17,6 +17,9 @@ if(!isset($_SESSION['kadi'])){
     <!-- Css Files -->
     <link rel="stylesheet" href="../assets/css/bootstrap.min.css">
     <link rel="stylesheet" href="../assets/css/style.css">
+    <!-- CK Editor -->
+    <script src="https://cdn.ckeditor.com/ckeditor5/39.0.1/classic/ckeditor.js"></script>
+
 
     <title>Document</title>
 </head>
@@ -35,6 +38,7 @@ if(!isset($_SESSION['kadi'])){
                 <div class="col-md-2 bg-dark py-3" id="adminNav">
                     <a href="dashboard.php">Başlangıç</a><br>
                     <a href="kategoriler.php">Kategoriler</a><br>
+                    <a href="yazilar.php">Yazılar</a><br>
                     <a href="logout.php" class="text-warning">Güvenli Çıkış</a>
                 </div>
                 <div class="col-md-10 bg-light py-3">
