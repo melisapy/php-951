@@ -39,6 +39,7 @@ if(!isset($_SESSION['kadi'])){
                     <a href="dashboard.php">Başlangıç</a><br>
                     <a href="kategoriler.php">Kategoriler</a><br>
                     <a href="yazilar.php">Yazılar</a><br>
+                    <a href="portfolyo.php">portfolyo</a><br>
                     <a href="logout.php" class="text-warning">Güvenli Çıkış</a>
                 </div>
                 <div class="col-md-10 bg-light py-3">
