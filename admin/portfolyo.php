@@ -1,18 +1,33 @@
-<?php 
-require_once('header.php'); 
+<?php
+require_once('header.php');
 
 
-if(isset($_GET['deleteID'])){
+if (isset($_GET['deleteID'])) {
     $id = $_GET['deleteID'];
 
-    $projeSil = $db -> prepare('delete from portfolyo where id=?');
-    $projeSil -> execute(array($id));
+    $projeSil = $db->prepare('delete from portfolyo where id=?');
+    $projeSil->execute(array($id));
 
-    if($projeSil -> rowCount()){
+    if ($projeSil->rowCount()) {
         echo '<script>alert("Proje Silindi")</script><meta http-equiv="refresh" content="0; url=portfolyo.php">';
     } else {
-        echo '<script>alert("Hata Oluştu")</script><meta http-equiv="refresh" content="0; url=portfolyo.php">'; 
+        echo '<script>alert("Hata Oluştu")</script><meta http-equiv="refresh" content="0; url=portfolyo.php">';
     }
+} elseif (isset($_GET['updateID'])) {
+    $id = $_GET['updateID'];
+
+    $projeGuncelle = $db->prepare('select * from portfolyo where id=?');
+    $projeGuncelle->execute(array($id));
+    $projeGuncelleSatir = $projeGuncelle->fetch();
+
+    echo '
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+            var myModal = new bootstrap.Modal(document.getElementById("exampleModal"));
+            myModal.show();
+            });
+        </script>
+    ';
 }
 ?>
 <!-- Admin Body Section Start -->
@@ -127,12 +142,6 @@ if(isset($_GET['deleteID'])){
 </div>
 <!-- Admin Body Section End -->
 
-
-
-
-
-
-
 <!-- Portfolio Save Module Start -->
 <?php
 if (isset($_POST['projeKaydet'])) {
@@ -151,6 +160,99 @@ if (isset($_POST['projeKaydet'])) {
 }
 ?>
 <!-- Portfolio Save Module End -->
+
+
+<!-- Update Modal Start -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel"><?php echo $projeGuncelleSatir['projeAdi']; ?></h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="" method="post" class="row" enctype="multipart/form-data">
+                    <div class="col-12">
+                        <input type="text" name="projeAdiUP" value="<?php echo $projeGuncelleSatir['projeAdi']; ?>" class="form-control">
+                    </div>
+                    <div class="col-12 my-3">
+                        <textarea name="aciklamaUP" rows="6" class="form-control"><?php echo $projeGuncelleSatir['aciklama']; ?></textarea>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Firma Adı</label>
+                        <input type="text" name="kurumUP" value="<?php echo $projeGuncelleSatir['kurum']; ?>" class="form-control">
+                    </div>
+                    <div class="col-md-4">
+                        <label>Proje Türü</label>
+                        <select name="projeTuruUP" class="form-control">
+                            <option value="<?php echo $projeGuncelleSatir['projeTuru']; ?>"><?php echo $projeGuncelleSatir['projeTuru']; ?></option>
+                            <option value="Bireysel">Bireysel</option>
+                            <option value="Kurumsal">Kurumsal</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <label>Hizmet</label>
+                        <select name="hizmetUP" class="form-control">
+                            <option value="<?php echo $projeGuncelleSatir['hizmet']; ?>"><?php echo $projeGuncelleSatir['hizmet']; ?></option>
+                            <option value="Dijital Pazarlama Hizmeti">Dijital Pazarlama Hizmeti</option>
+                            <option value="Grafik Tasarımı Hizmeti">Grafik Tasarımı Hizmeti</option>
+                            <option value="Web Tasarımı Hizmeti">Web Tasarımı Hizmeti</option>
+                        </select>
+                    </div>
+                    <div class="col-md-4 my-3">
+                        <label>Kullanılan Teknolojiler</label>
+                        <input type="text" name="teknolojiUP" value="<?php echo $projeGuncelleSatir['teknoloji']; ?>" class="form-control">
+                    </div>
+                    <div class="col-md-4 my-3">
+                        <label>Proje Adresi</label>
+                        <input type="url" name="adresUP" value="<?php echo $projeGuncelleSatir['adres']; ?>" class="form-control">
+                    </div>
+                    <div class="col-md-4 my-3">
+                        <label>Proje Görseli: <b><?php echo substr($projeGuncelleSatir['gorsel'],14); ?></b></label>
+                        <input type="file" name="gorselUP" class="form-control">
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-success w-100" name="guncelle">Kaydet</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Update Modal End -->
+
+<!-- Update Module Start -->
+
+<?php
+
+if(isset($_POST['guncelle'])){
+    $gorsel = '../assets/img/'.$_FILES['gorselUP']['name'];
+
+    if(move_uploaded_file($_FILES['gorselUP']['tmp_name'],$gorsel)){
+        $guncelle = $db -> prepare('update portfolyo set projeAdi=?, aciklama=?, kurum=?, projeTuru=?, hizmet=?, teknoloji=?, adres=?, gorsel=? where id=?');
+        $guncelle -> execute(array($_POST['projeAdiUP'], $_POST['aciklamaUP'], $_POST['kurumUP'], $_POST['projeTuruUP'], $_POST['hizmetUP'], $_POST['teknolojiUP'], $_POST['adresUP'],$gorsel,$id));
+
+        if($guncelle -> rowCount()){
+            echo '<script>alert("Güncelleme Başarılı")</script><meta http-equiv="refresh" content="0; url=portfolyo.php">';
+        } else {
+            echo '<script>alert("Hata Oluştu")</script><meta http-equiv="refresh" content="0; url=portfolyo.php">';
+        }
+    } else {
+        $guncelle = $db -> prepare('update portfolyo set projeAdi=?, aciklama=?, kurum=?, projeTuru=?, hizmet=?, teknoloji=?, adres=? where id=?');
+        $guncelle -> execute(array($_POST['projeAdiUP'], $_POST['aciklamaUP'], $_POST['kurumUP'], $_POST['projeTuruUP'], $_POST['hizmetUP'], $_POST['teknolojiUP'], $_POST['adresUP'],$id));
+
+        if($guncelle -> rowCount()){
+            echo '<script>alert("Güncelleme Başarılı")</script><meta http-equiv="refresh" content="0; url=portfolyo.php">';
+        } else {
+            echo '<script>alert("Hata Oluştu")</script><meta http-equiv="refresh" content="0; url=portfolyo.php">';
+        }
+    }
+}
+
+?>
+
+<!-- Update Module End -->
+
 
 
 <?php require_once('footer.php'); ?>
